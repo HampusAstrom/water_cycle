@@ -1,5 +1,7 @@
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import random as rng
 from mpl_toolkits.mplot3d import Axes3D
 import math
@@ -31,18 +33,90 @@ def diffuse(map, scale_fac):
     kernel=np.array([[0, scale_fac, 0],
                   [scale_fac, 1-4*scale_fac, scale_fac],
                   [0, scale_fac, 0]], dtype='float64')
-    diffused=convolve2d(map,kernel,mode='same', boundary='symm')
+    diffused=convolve2d(map,kernel,mode='same', boundary='wrap')
     return diffused
 
-#test = np.zeros((4, 4))
-#test[1, 1] = 1
-#test[1, 0] = 1
-#test[0, 0] = 2
+def flow_to_dir(map, direction, scale_fac):
+    if direction == 'up':
+        kernel=np.array([[0, 0, 0],
+                      [0, scale_fac, 0],
+                      [0, -scale_fac, 0]], dtype='float64')
+    elif direction == 'down':
+        kernel=np.array([[0, -scale_fac, 0],
+                      [0, scale_fac, 0],
+                      [0, 0, 0]], dtype='float64')
+    elif direction == 'left':
+        kernel=np.array([[0, 0, 0],
+                      [0, scale_fac, -scale_fac],
+                      [0, 0, 0]], dtype='float64')
+    elif direction == 'right':
+        kernel=np.array([[0, 0, 0],
+                      [-scale_fac, scale_fac, 0],
+                      [0, 0, 0]], dtype='float64')
+    else:
+        print('invalid direction')
+        exit()
+    flow=convolve2d(map,kernel,mode='same', boundary='wrap')
+    return flow.clip(min = 0)
 
-#print(test)
+def flow_water(rock_map, water_map, scale_fac):
+    sum = rock_map + water_map
+    u = flow_to_dir(sum, 'up', scale_fac)
+    d = flow_to_dir(sum, 'down', scale_fac)
+    l = flow_to_dir(sum, 'left', scale_fac)
+    r = flow_to_dir(sum, 'right', scale_fac)
+    flow_sum = u + d + l + r
+    fact = np.divide(water_map, flow_sum, out=np.zeros_like(water_map), where=flow_sum != 0)
+    fact = fact.clip(max = 1)
+    u = u * fact
+    d = d * fact
+    l = l * fact
+    r = r * fact
+    rem_water = u + d + l + r
+    add_water = np.roll(u, -1, axis=0) + np.roll(d, 1, axis=0) + np.roll(l, -1, axis=1) + np.roll(r, 1, axis=1)
+    water_map = water_map - rem_water + add_water
+    water_map = water_map.clip(min = 0)
+    return rock_map, water_map
 
-#ret = diffuse(test, 0.05)
-#print(ret)
+
+
+# test = np.zeros((4, 4))
+# test_rock = np.zeros((4, 4))
+# test_water = np.zeros((4, 4))
+# test_rock[1, 1] = 1
+# test_rock[1, 2] = 1
+# test_water[1, 1] = 1
+# test_water[3, 3] = 1
+# test = test_rock + test_water
+#
+# print('test:')
+# print(test)
+#
+# up = flow_to_dir(test, 'up', 0.25)
+# print('up:')
+# print(up)
+# down = flow_to_dir(test, 'down', 0.25)
+# print('down:')
+# print(down)
+# left = flow_to_dir(test, 'left', 0.25)
+# print('left:')
+# print(left)
+# right = flow_to_dir(test, 'right', 0.25)
+# print('right:')
+# print(right)
+#
+# print()
+# print()
+# print()
+#
+# test_rock, test_water = flow_water(test_rock, test_water, 0.25)
+#
+# print('test_rock')
+# print(test_rock)
+# print('test_water')
+# print(test_water)
+#
+# exit()
 
 pi = math.pi
 x_size = 100
@@ -97,7 +171,7 @@ ax = fig.add_subplot(111, projection='3d')
 ax.plot_surface(X, Y, rock, cmap='jet', edgecolor="none")
 plt.show()
 
-for i in range(10):
+for i in range(15):
     rock = diffuse(rock, 0.10)
 plt.imshow(rock)
 plt.show()
@@ -106,4 +180,43 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 ax.plot_surface(X, Y, rock, cmap='jet', edgecolor="none")
+plt.show()
+
+mean_rock = np.mean(rock)
+
+water = np.zeros((x_size, y_size))
+water += mean_rock/5
+
+minc = -20
+maxc = 5
+for i in range(10):
+    fig = plt.figure(i)
+    ax = fig.add_subplot(221, projection='3d')
+    ax.plot_surface(X, Y, rock, cmap='jet', edgecolor="none")
+    ax = fig.add_subplot(222, projection='3d')
+    ax.plot_surface(X, Y, water, cmap='jet', edgecolor="none")
+    ax = fig.add_subplot(223, projection='3d')
+    ax.plot_surface(X, Y, rock + water, cmap='jet', edgecolor="none")
+    ax = fig.add_subplot(224, projection='3d')
+    norm = matplotlib.colors.Normalize(minc, maxc)
+    m = plt.cm.ScalarMappable(norm=norm, cmap='terrain')
+    m.set_array([])
+    cmap = m.to_rgba(-water)
+    ax.plot_surface(X, Y, rock, facecolors=cmap, vmin=minc, vmax=maxc, edgecolor="none")
+    ax.plot_surface(X, Y, rock + water, facecolors=cmap, vmin=minc, vmax=maxc, edgecolor="none")
+    ax.set_zlim(zmin = 0)
+    plt.show()
+
+    for j in range(500):
+        rock, water = flow_water(rock, water, 0.10)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+norm = matplotlib.colors.Normalize(minc, maxc)
+m = plt.cm.ScalarMappable(norm=norm, cmap='terrain')
+m.set_array([])
+cmap = m.to_rgba(-water)
+ax.plot_surface(X, Y, rock, facecolors=cmap, vmin=minc, vmax=maxc, edgecolor="none")
+ax.plot_surface(X, Y, rock + water, facecolors=cmap, vmin=minc, vmax=maxc, edgecolor="none")
+ax.set_zlim(zmin = 0)
 plt.show()
