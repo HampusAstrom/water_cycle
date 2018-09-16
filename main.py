@@ -91,10 +91,16 @@ def plot_4(rock, water, X, Y, minc, maxc, i):
     fig = plt.figure(i)
     ax = fig.add_subplot(221, projection='3d')
     ax.plot_surface(X, Y, rock, cmap='jet', edgecolor="none")
+    plt.xlabel('y')
+    plt.ylabel('x')
     ax = fig.add_subplot(222, projection='3d')
     ax.plot_surface(X, Y, water, cmap='jet', edgecolor="none")
+    plt.xlabel('y')
+    plt.ylabel('x')
     ax = fig.add_subplot(223, projection='3d')
     ax.plot_surface(X, Y, rock + water, cmap='jet', edgecolor="none")
+    plt.xlabel('y')
+    plt.ylabel('x')
     ax = fig.add_subplot(224, projection='3d')
     norm = matplotlib.colors.Normalize(minc, maxc)
     m = plt.cm.ScalarMappable(norm=norm, cmap='terrain')
@@ -102,6 +108,8 @@ def plot_4(rock, water, X, Y, minc, maxc, i):
     cmap = m.to_rgba(-water)
     ax.plot_surface(X, Y, rock, facecolors=cmap, vmin=minc, vmax=maxc, edgecolor="none")
     ax.plot_surface(X, Y, rock + water, facecolors=cmap, vmin=minc, vmax=maxc, edgecolor="none")
+    plt.xlabel('y')
+    plt.ylabel('x')
     ax.set_zlim(zmin = 0, zmax = 200)
     plt.show()
 
@@ -114,6 +122,8 @@ def plot_1(rock, water, X, Y, minc, maxc, i):
     cmap = m.to_rgba(-water)
     ax.plot_surface(X, Y, rock, facecolors=cmap, vmin=minc, vmax=maxc, edgecolor="none")
     ax.plot_surface(X, Y, rock + water, facecolors=cmap, vmin=minc, vmax=maxc, edgecolor="none")
+    plt.xlabel('y')
+    plt.ylabel('x')
     ax.set_zlim(zmin = 0, zmax = 200)
     plt.show()
 
@@ -168,15 +178,34 @@ add_min = 0
 add_max = 10
 add_times = 100000
 
-point_list.append(Gaussian_point(0.20, 0.45, 0.35, 0.45, 0.30, 3*pi/16))
-point_list.append(Gaussian_point(0.15, 0.45, 0.35, 0.55, 0.40, 0*pi/16))
-point_list.append(Gaussian_point(0.10, 0.45, 0.10, 0.45, 0.25, pi/8))
-point_list.append(Gaussian_point(0.08, 0.70, 0.20, 0.35, 0.15, 7*pi/16))
-point_list.append(Gaussian_point(0.05, 0.80, 0.20, 0.80, 0.25, 5*pi/16))
-point_list.append(Gaussian_point(0.05, 0.20, 0.25, 0.25, 0.15, 1*pi/32))
-point_list.append(Gaussian_point(0.05, 0.70, 0.15, 0.80, 0.10, 5*pi/32))
-point_list.append(Gaussian_point(0.02, 0.80, 0.10, 0.40, 0.05, 0))
-point_list.append(Gaussian_point(0.02, 0.80, 0.10, 0.60, 0.05, 5*pi/8))
+# crater island
+if 0:
+    point_list.append(Gaussian_point(0.20, 0.45, 0.35, 0.45, 0.30, 3*pi/16))
+    point_list.append(Gaussian_point(0.15, 0.45, 0.35, 0.55, 0.40, 0*pi/16))
+    point_list.append(Gaussian_point(0.10, 0.45, 0.10, 0.45, 0.25, pi/8))
+    point_list.append(Gaussian_point(0.08, 0.70, 0.20, 0.35, 0.15, 7*pi/16))
+    point_list.append(Gaussian_point(0.05, 0.80, 0.20, 0.80, 0.25, 5*pi/16))
+    point_list.append(Gaussian_point(0.05, 0.20, 0.25, 0.25, 0.15, 1*pi/32))
+    point_list.append(Gaussian_point(0.05, 0.70, 0.15, 0.80, 0.10, 5*pi/32))
+    point_list.append(Gaussian_point(0.02, 0.80, 0.10, 0.40, 0.05, 0))
+    point_list.append(Gaussian_point(0.02, 0.80, 0.10, 0.60, 0.05, 5*pi/8))
+
+# in progress
+if 1:
+    point_list.append(Gaussian_point(0.20, 0.35, 0.45, 0.35, 0.40, 3*pi/16))
+    point_list.append(Gaussian_point(0.15, 0.25, 0.35, 0.45, 0.40, 0*pi/16))
+    point_list.append(Gaussian_point(0.10, 0.25, 0.25, 0.85, 0.20, pi/8))
+    point_list.append(Gaussian_point(0.08, 0.70, 0.20, 0.30, 0.15, 7*pi/16))
+    point_list.append(Gaussian_point(0.05, 0.15, 0.20, 0.50, 0.35, 7*pi/16))
+    point_list.append(Gaussian_point(0.05, 0.45, 0.10, 0.35, 0.25, pi/8))
+    point_list.append(Gaussian_point(0.05, 0.80, 0.20, 0.80, 0.25, 5*pi/16))
+    point_list.append(Gaussian_point(0.05, 0.20, 0.25, 0.25, 0.15, 1*pi/32))
+    point_list.append(Gaussian_point(0.05, 0.70, 0.15, 0.80, 0.10, 5*pi/32))
+    point_list.append(Gaussian_point(0.05, 0.90, 0.15, 0.10, 0.20, 5*pi/32))
+    point_list.append(Gaussian_point(0.05, 0.60, 0.25, 0.60, 0.30, 5*pi/32))
+    point_list.append(Gaussian_point(0.02, 0.85, 0.10, 0.45, 0.05, 0))
+    point_list.append(Gaussian_point(0.02, 0.80, 0.10, 0.60, 0.05, 5*pi/8))
+
 
 amp_tot = 0
 for point in point_list:
@@ -205,35 +234,46 @@ for i in range(add_times):
 X, Y = np.meshgrid(range(x_size), range(y_size))
 
 plt.imshow(rock)
+plt.xlabel('y')
+plt.ylabel('x')
 plt.show()
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 ax.plot_surface(X, Y, rock, cmap='jet', edgecolor="none")
+plt.xlabel('y')
+plt.ylabel('x')
 plt.show()
 
-for i in range(15):
+for i in range(20): # 15 used for island
     rock = diffuse(rock, 0.10)
 plt.imshow(rock)
+plt.xlabel('y')
+plt.ylabel('x')
 plt.show()
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 ax.plot_surface(X, Y, rock, cmap='jet', edgecolor="none")
+plt.xlabel('y')
+plt.ylabel('x')
 plt.show()
 
 mean_rock = np.mean(rock)
+max_rock = np.max(rock)
+min_rock = np.min(rock)
 
 water = np.zeros((x_size, y_size))
-water += mean_rock/5
+water += (max_rock-mean_rock)/5
+# water += mean_rock/5
 # water[0,0] += x_size*y_size*mean_rock/5
 
-plot_spash = 1
+plot_spash = 0
 minc = -5
 maxc = 12
-
+# flow initial water to some approximative equilibrium
 for i in range(10):
     if plot_spash:
         plot_4(rock, water, X, Y, minc, maxc, i)
@@ -241,8 +281,9 @@ for i in range(10):
     for j in range(500):
         rock, water = flow_water(rock, water, 0.10)
 
+# evaporate, percipitate and flow
 for i in range(10):
     plot_1(rock, water, X, Y, minc, maxc, i)
     for j in range(500):
-        rock , water = evap(rock, water, 0.0003)
+        rock , water = evap(rock, water, 0.0002)
         rock, water = flow_water(rock, water, 0.10)
